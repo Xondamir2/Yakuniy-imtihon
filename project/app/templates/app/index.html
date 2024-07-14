@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> расходы и доходы</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <style>
+        body {
+            background-color: #2e2e2e;
+            color: #fff;
+            font-family: 'Arial', sans-serif;
+            animation: fadeIn 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        .navbar {
+            background-color: #1e1e1e;
+        }
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5em;
+            color: #fff;
+        }
+        .navbar-nav .nav-link {
+            color: #fff;
+        }
+        .content {
+            padding: 20px;
+        }
+        .card {
+            background-color: #3e3e3e;
+            border: none;
+            max-width: 550px;
+            margin: auto;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .bar-chart {
+            margin-top: 10px;
+        }
+        .bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            background-color:
+            border-radius: 5px;
+            height: 30px;
+            position: relative;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        .bar span {
+            display: block;
+            height: 100%;
+            transition: width 0.5s ease-in-out;
+        }
+        .btn-create {
+            display: block;
+            padding: 10px 15px;
+            border-radius: 5px;
+            color: #fff;
+            text-align: center;
+            font-weight: bold;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .btn-expenses {
+            background-color: #dc3545;
+        }
+        .btn-income {
+            background-color: #28a745;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <a class="navbar-brand" href="{% url 'index' %}">Расходы и Доходы</a>
+</nav>
+
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            Расходы
+                            <i class="fas fa-arrow-down sort-icon" onclick="sortBars('expenses', 'desc')"></i>
+                            <i class="fas fa-arrow-up sort-icon" onclick="sortBars('expenses', 'asc')"></i>
+                        </h5>
+                        <div class="bar-chart" id="expenses-bars">
+                            {% if expenses_percentage %}
+                                {% for item in expenses_percentage %}
+                                <div class="bar" data-percentage="{{ item.percentage }}">
+                                    <span style="background-color: {{ item.color }}; width: {{ item.percentage }}%;"></span>
+                                    <strong>{{ item.category }}</strong>: {{ item.percentage|floatformat:2 }}%
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <p>No data available for expenses.</p>
+                            {% endif %}
+                        </div>
+                        <a href="{% url 'expenses_category' %}" class="btn-create btn-expenses"><i class="fas fa-plus"></i> Добавить категорию</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            Доходы
+                            <i class="fas fa-arrow-down sort-icon" onclick="sortBars('income', 'desc')"></i>
+                            <i class="fas fa-arrow-up sort-icon" onclick="sortBars('income', 'asc')"></i>
+                        </h5>
+                        <div class="bar-chart" id="income-bars">
+                            {% if income_percentage %}
+                                {% for item in income_percentage %}
+                                <div class="bar" data-percentage="{{ item.percentage }}">
+                                    <span style="background-color: {{ item.color }}; width: {{ item.percentage }}%;"></span>
+                                    <strong>{{ item.category }}</strong>: {{ item.percentage|floatformat:2 }}%
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <p>No data available for income.</p>
+                            {% endif %}
+                        </div>
+                        <a href="{% url 'income_category' %}" class="btn-create btn-income"><i class="fas fa-plus"></i> Добавить категорию</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="wallet-total text-center mt-4">
+            <h2 class="mb-4">Статистика вашего кошелька</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card bg-success text-white mb-4">
+                        <div class="card-body">
+                            <h4>Общая сумма кошелька:</h4>
+                            <h5>{{ total_wallet_amount }} Uzs</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-danger text-white mb-4">
+                        <div class="card-body">
+                            <h4>Общие расходы:</h4>
+                            <h5>{{ total_expenses }} Uzs</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-info text-white mb-4">
+                        <div class="card-body">
+                            <h4>Общий доход:</h4>
+                            <h5>{{ total_income }} Uzs</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <p>&copy; 2024 Расходы и Доходы. Все права защищены.</p>
+</footer>
+</body>
+</html>
